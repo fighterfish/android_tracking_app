@@ -33,7 +33,7 @@ boolean drawCamera = true;
 PImage prevFrame;
 // How different must a pixel be to be a "motion" pixel
 float threshold = 50;
-
+color c;
 void setup() {
   fullScreen(P3D);
   //size(320,240,P3D);
@@ -53,17 +53,23 @@ void setup() {
   //smooth();
    // Create an empty image the same size as the video
  // prevFrame = createImage(cam.width, cam.height, RGB);
+ //registerPre(this);
+
 }
 
 void draw() {
-  loadPixels();
+  
+   textSize(64);
+text("touch to start tracking", displayWidth/2, displayHeight/2); 
+fill(0, 102, 153);
    // Draw the video image on the background 
     //image(cam,0,0,320,240); 
     if (drawCamera){
+      //loadPixels();
   image(cam, 0, 0, displayWidth, displayHeight);
     }
-  rect(width/2, height/2, 55, 55);
-  cam.loadPixels();
+  //rect(width/2, height/2, 55, 55);
+  //cam.loadPixels();
   //prevFrame.loadPixels();
       // You don't need to display it to analyze it!
   //image(cam, 0, 0);
@@ -73,6 +79,7 @@ void draw() {
   float closestDiff = 500.0f; 
   int closestX = 0; 
   int closestY = 0; 
+  cam.loadPixels();
   // Begin loop to walk through every pixel 
   for ( int x = 0; x < cam.width; x++) { 
     for ( int y = 0; y < cam.height; y++) { 
@@ -92,14 +99,21 @@ void draw() {
       } 
     } 
   } 
+  cam.updatePixels();
   //println(displayHeight);
   //calculate the offset since we are scaling the vid
   float xOffset = displayWidth / 320;
   float yOffset = displayHeight / 240;
   // Draw a circle at the tracked pixel 
-  ellipse(closestX*xOffset,closestY*yOffset,16,16); 
+  fill(c);
+  ellipse(closestX*xOffset,closestY*yOffset,32,32); 
 
 }
+/*
+void pre(){
+   // do all the state calculations here
+}
+*/
 //cam.loadPixels();
 void onCameraPreviewEvent()
 {
@@ -122,7 +136,7 @@ void mousePressed()
     //println(loc);
     //trackColor = cam.pixels[loc]; 
     trackColor = get(mouseX,mouseY); 
-    color c = trackColor;
+    c = trackColor;
     fill(c);
       // Draw a circle at the tracked pixel 
      ellipse(mouseX,mouseY,100,100); 
