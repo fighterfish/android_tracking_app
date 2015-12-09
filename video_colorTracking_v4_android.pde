@@ -12,6 +12,8 @@ void onCameraPreviewEvent(){
   cam.read();
 }
 
+//testing
+
 void draw() {
   if(cam.isStarted())
     image(cam, width/2, height/2);
