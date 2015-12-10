@@ -14,6 +14,7 @@ void onCameraPreviewEvent(){
 
 //testing
 // ru edit directly from Github
+// some new changes
 
 void draw() {
   if(cam.isStarted())
