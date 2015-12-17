@@ -1,32 +1,11 @@
-/*import ketai.camera.*;
-KetaiCamera cam;
-
-void setup() {
-  //orientation(LANDSCAPE);
-  imageMode(CENTER);
-  cam = new KetaiCamera(this, 950, 540, 24);
-  cam.setCameraID(1);
-}
-
-void onCameraPreviewEvent(){
-  cam.read();
-}
-
-//testing
-// ru edit directly from Github
-// some new changes
-
-void draw() {
-  if(cam.isStarted())
-    image(cam, width/2, height/2);
-  else
-    cam.start();
-} */
-
 import ketai.camera.*;
 import ketai.ui.*;
+import controlP5.*;
+import de.looksgood.ani.*;
+
 KetaiVibrate vibe;
 KetaiCamera cam;
+ControlP5 cp5;
 // Variable for capture device 
 //Capture video; 
 color trackColor; 
@@ -36,6 +15,11 @@ PImage prevFrame;
 // How different must a pixel be to be a "motion" pixel
 float threshold = 50;
 color c;
+// for MENU UI
+float x = 0;
+float y = 0;
+String menuState = "closed";
+
 void setup() {
   fullScreen(P3D);
   //size(320,240,P3D);
@@ -56,11 +40,43 @@ void setup() {
    // Create an empty image the same size as the video
  // prevFrame = createImage(cam.width, cam.height, RGB);
  //registerPre(this);
+// you have to call always Ani.init() first!
+  Ani.init(this);
+  cp5 = new ControlP5(this);
+  cp5.addButton("SAMPLE_COLOUR")
+     .setPosition(x,y)
+     .setSize(200,50)
+     .setValue(0)
+     ;
 
+  cp5.addButton("MENU")
+     .setPosition(x,y-41)
+     .setSize(200,40)
+     .setValue(0)
+     ;
+  // add a vertical slider
+  cp5.addSlider("slider")
+     .setPosition(x,y+51)
+     .setSize(200,50)
+     .setRange(0,height)
+     .setValue(128)
+     ;
+  
+  y = height;
 }
 
 void draw() {
-  
+/* ---------------------UI ELEMENTS ----------------------- */
+  // cp5.getName("colorC").setPosition(x,y);
+   cp5.getController("SAMPLE_COLOUR").setPosition(x,y);
+ //  cp5.getController("colorB").setPosition(x,y+51);
+   cp5.getController("slider").setPosition(x,y+51);
+     // reposition the Label for controller 'slider'
+  //cp5.getController("slider").getValueLabel().align(ControlP5.LEFT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
+  cp5.getController("slider").getCaptionLabel().align(ControlP5.RIGHT, ControlP5.BOTTOM_OUTSIDE).setPaddingX(0);
+   //cp5.getController("play").setPosition(x+150,y-51);
+   cp5.getController("MENU").setPosition(x,y-41);
+/* ---------------------UI ELEMENTS ----------------------- */   
    textSize(64);
 text("touch to start tracking", displayWidth/2, displayHeight/2); 
 fill(0, 102, 153);
@@ -109,7 +125,13 @@ fill(0, 102, 153);
   // Draw a circle at the tracked pixel 
   fill(c);
   ellipse(closestX*xOffset,closestY*yOffset,32,32); 
-
+/*---------------------- The Threshhold Bar ---------------------- */
+  stroke(255,20,147);
+  line(0, height - cp5.getController("slider").getValue(), width, height - cp5.getController("slider").getValue());//X1, X2 , Y1, Y2
+noStroke();
+fill(255,20,147, 20);
+rect(0,height - cp5.getController("slider").getValue(),width, height);
+noFill();
 }
 /*
 void pre(){
@@ -123,6 +145,27 @@ void onCameraPreviewEvent()
   //prevFrame.copy(cam, 0, 0, cam.width, cam.height, 0, 0, cam.width, cam.height);
   //prevFrame.updatePixels(); 
   cam.read();
+}
+
+public void controlEvent(ControlEvent theEvent) {
+  println(theEvent.getController().getName());
+  //n = 0;
+}
+public void SAMPLE_COLOUR(int theValue) {
+  println("a button event from SAMPLE_COLOUR: "+theValue);
+}
+public void MENU(int theValue) {  
+   println("a button event from Menu: "+theValue);
+     //y = height;
+    if (menuState == "closed"){
+    Ani.to(this, 1.0, "y", height-100, Ani.EXPO_OUT); // OPEN MENU   
+     menuState = "open";
+     cp5.getController("MENU").setCaptionLabel("MENU    [-]"); 
+     } else {
+     Ani.to(this, 1.0, "y", height, Ani.EXPO_OUT); // close Menu
+     menuState = "closed";
+     cp5.getController("MENU").setCaptionLabel("MENU    [+]"); 
+  }
 }
 
 // start/stop camera preview by tapping the screen
